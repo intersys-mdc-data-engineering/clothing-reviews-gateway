@@ -1,8 +1,10 @@
 package com.intersys.mdc.demo.reviews.controller
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{Route, StandardRoute}
+import akka.http.scaladsl.model.{HttpHeader, StatusCodes}
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.headers._
+import akka.http.scaladsl.model.HttpMethods._
 import com.intersys.mdc.demo.reviews.config.Context
 import com.intersys.mdc.demo.reviews.model.Review
 import com.intersys.mdc.demo.reviews.service.streaming.Streaming
@@ -10,9 +12,17 @@ import com.intersys.mdc.demo.reviews.service.streaming.Streaming
 case object GatewayController extends Context {
   import Review.JsonSupport._
 
-  def sendToStream(review: Review): StandardRoute = {
+  private val corsResponseHeaders: List[HttpHeader] = List(
+    `Access-Control-Allow-Origin`.*,
+    `Access-Control-Allow-Methods`(POST, GET),
+    `Access-Control-Allow-Headers`("Origin", "Accept", "Content-Type", "X-Requested-With", "X-CSRF-Token")
+  )
+
+  def sendToStream(review: Review): Route = {
     Streaming.ref ! review.toMongoReview
-    complete(StatusCodes.OK)
+    respondWithHeaders(corsResponseHeaders) {
+      complete(StatusCodes.OK)
+    }
   }
 
   val addRoute: Route = path("add") {
