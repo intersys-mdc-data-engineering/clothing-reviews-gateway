@@ -1,6 +1,6 @@
 package com.intersys.mdc.demo.reviews.controller
 
-import akka.http.scaladsl.model.{HttpHeader, StatusCodes}
+import akka.http.scaladsl.model.{HttpHeader, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model.headers._
@@ -20,9 +20,7 @@ case object GatewayController extends Context {
 
   def sendToStream(review: Review): Route = {
     Streaming.ref ! review.toMongoReview
-    respondWithHeaders(corsResponseHeaders) {
-      complete(StatusCodes.OK)
-    }
+    complete(HttpResponse(StatusCodes.OK).withHeaders(corsResponseHeaders))
   }
 
   val addRoute: Route = path("add") {
