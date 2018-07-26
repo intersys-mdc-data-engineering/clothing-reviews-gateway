@@ -3,9 +3,9 @@ package com.intersys.mdc.demo.reviews.model
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
-case class Review(reviewerName: String, reviewerText: String, overall: Int, summary: String, asin: String, reviewerId: String) {
+case class Review(reviewerName: String, reviewText: String, overall: Int, summary: String, asin: String, reviewerID: String) {
   def toMongoReview: MongoReview =
-    MongoReview(reviewerName, reviewerText, overall, summary, asin, reviewerId)
+    MongoReview(reviewerName, reviewText, overall, summary, asin, reviewerID)
 }
 
 object Review {

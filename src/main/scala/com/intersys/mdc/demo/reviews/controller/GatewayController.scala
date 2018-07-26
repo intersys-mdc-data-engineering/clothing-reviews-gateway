@@ -14,30 +14,34 @@ case object GatewayController extends Context {
 
   private val corsResponseHeaders: List[HttpHeader] = List(
     `Access-Control-Allow-Origin`.*,
-    `Access-Control-Allow-Methods`(POST, GET),
-    `Access-Control-Allow-Headers`("Origin", "Accept", "Content-Type", "X-Requested-With", "X-CSRF-Token")
+    `Access-Control-Allow-Methods`(POST, GET, OPTIONS),
+    `Access-Control-Allow-Headers`("Origin", "Accept", "Content-Type", "X-Requested-With", "X-CSRF-Token", "Authorization")
   )
 
   def sendToStream(review: Review): Route = {
     Streaming.ref ! review.toMongoReview
-    complete(HttpResponse(StatusCodes.OK).withHeaders(corsResponseHeaders))
+    complete(HttpResponse(StatusCodes.OK))
   }
 
   val addRoute: Route = path("add") {
-    get {
-      parameters(
-        'reviewerName.as[String],
-        'reviewerText.as[String],
-        'overall.as[Int],
-        'summary.as[String],
-        'asin.as[String],
-        'reviewerId.as[String]
-      ).as(Review.apply) { review =>
-        sendToStream(review)
-      }
-    } ~ post {
-      entity(as[Review]) { review =>
-        sendToStream(review)
+    respondWithHeaders(corsResponseHeaders) {
+      get {
+        parameters(
+          'reviewerName.as[String],
+          'reviewText.as[String],
+          'overall.as[Int],
+          'summary.as[String],
+          'asin.as[String],
+          'reviewerID.as[String]
+        ).as(Review.apply) { review =>
+          sendToStream(review)
+        }
+      } ~ post {
+        entity(as[Review]) { review =>
+          sendToStream(review)
+        }
+      } ~ options {
+        complete(HttpResponse(StatusCodes.OK))
       }
     }
   }
