@@ -11,5 +11,5 @@ trait MongoModel {
 }
 
 object MongoModel {
-  val codecRegistry: CodecRegistry = fromRegistries(fromProviders(classOf[Review]), DEFAULT_CODEC_REGISTRY)
+  val codecRegistry: CodecRegistry = fromRegistries(fromProviders(classOf[MongoReview]), DEFAULT_CODEC_REGISTRY)
 }

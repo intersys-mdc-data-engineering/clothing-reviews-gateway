@@ -26,7 +26,7 @@ case object Kafka extends PubSub {
 
   val producer = new KafkaProducer[String, String](properties)
 
-  def publishSink[T](key: String, topic: String): Sink[T, Future[Done]] = Sink.foreach[T](element => {
+  def publishSink[T](key: String, topic: String): Sink[T, Future[Done]] = Sink.foreach[T]((element: T) => {
     val record: ProducerRecord[String, String] = new ProducerRecord[String, String](topic, key, element.toString)
     producer.send(record)
   })
